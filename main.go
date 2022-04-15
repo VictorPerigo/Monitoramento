@@ -11,11 +11,13 @@ func main() {
 }
 
 func exibirMenu() {
-	fmt.Println("Olá, que deseja fazer?")
-	fmt.Println("1 - Iniciar monitoramento")
-	fmt.Println("2 - Exibir os logs")
-	fmt.Println("0 - Sair do programa:")
-	menuFuncionamento()
+	for {
+		fmt.Println("\nOque deseja fazer?")
+		fmt.Println("1 - Iniciar monitoramento")
+		fmt.Println("2 - Exibir os logs")
+		fmt.Println("0 - Sair do programa:")
+		menuFuncionamento()
+	}
 }
 
 func menuFuncionamento() {
@@ -42,12 +44,10 @@ func inputOpcao() int {
 }
 
 func monitoramento() {
-	fmt.Println("Monitorando...")
+	fmt.Print("\033[H\033[2J")
 	urls := []string{
-		"abirujeison",
-		"https://www.google.com.br",
+		"https://www.google.com.br/jonas",
 		"https://www.youtube.com",
-		"http://localhost:4200/",
 	}
 
 	for _, url := range urls {
@@ -56,10 +56,10 @@ func monitoramento() {
 		if err != nil {
 			fmt.Println("Erro ao acessar a url:", err)
 		} else if response.StatusCode == 200 {
-			fmt.Println("Site está funcionando!", url, "status code:", response.StatusCode)
+			fmt.Println("status code:", response.StatusCode, "OK  Site:", url)
 			defer response.Body.Close()
 		} else {
-			fmt.Println("Site está offline", response.StatusCode)
+			fmt.Println("status code:", response.StatusCode, "ERR Site:", url)
 			defer response.Body.Close()
 		}
 	}
