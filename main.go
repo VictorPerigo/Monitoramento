@@ -44,20 +44,24 @@ func inputOpcao() int {
 func monitoramento() {
 	fmt.Println("Monitorando...")
 	urls := []string{
+		"abirujeison",
 		"https://www.google.com.br",
 		"https://www.youtube.com",
-		"localhost:8080",
 		"http://localhost:4200/",
 	}
 
 	for _, url := range urls {
 		response, err := http.Get(url)
+
 		if err != nil {
 			fmt.Println("Erro ao acessar a url:", err)
 		} else if response.StatusCode == 200 {
-			fmt.Println("Site está funcionando!", url)
+			fmt.Println("Site está funcionando!", url, "status code:", response.StatusCode)
+			defer response.Body.Close()
 		} else {
 			fmt.Println("Site está offline", response.StatusCode)
+			defer response.Body.Close()
 		}
 	}
+
 }
