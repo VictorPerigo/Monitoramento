@@ -15,6 +15,8 @@ var urls []string = []string{
 	"https://www.youtube.com",
 }
 
+// funcionamento dos menus:
+
 func menuFuncionamento() {
 	switch inputOpcao() {
 	case 1: // Iniciar monitoramento
@@ -22,7 +24,7 @@ func menuFuncionamento() {
 	case 2: // Exibir os logs
 		fmt.Println("Exibindo os logs...")
 	case 3: // Urls
-		menuUrls()
+		menuFuncionamentoUrls()
 	case 0: // Sair do programa
 		fmt.Println("Saindo do programa...")
 		os.Exit(0)
@@ -32,36 +34,8 @@ func menuFuncionamento() {
 	}
 }
 
-func inputOpcao() int {
-	opcao := 5
-	// variavel opcao recebe o valor digitado pelo usuario, sem expecificar o tipo do input, o proprio go ira inferir o tipo apartir da variavel opcao
-	fmt.Scan(&opcao)
-
-	return opcao
-}
-
-func monitoramento() {
-	fmt.Print("\033[H\033[2J")
-
-	for _, url := range urls {
-		response, err := http.Get(url)
-
-		if err != nil {
-			fmt.Println("Erro ao acessar a url:", err)
-		} else if response.StatusCode == 200 {
-			fmt.Println("status code:", response.StatusCode, "OK  Site:", url)
-			defer response.Body.Close()
-		} else {
-			fmt.Println("status code:", response.StatusCode, "ERR Site:", url)
-			defer response.Body.Close()
-		}
-	}
-
-}
-
-func menuUrls() {
+func menuFuncionamentoUrls() {
 	exibirUrls()
-
 	exibirMenuUrl()
 
 	switch inputOpcao() {
@@ -76,6 +50,36 @@ func menuUrls() {
 		fmt.Println("Opção invalida")
 	}
 }
+
+// exibicoes:
+
+func exibirUrls() {
+	limparTerminal()
+	fmt.Println("Urls:")
+	for index, url := range urls {
+		fmt.Println("index:", index, ", url:", url)
+	}
+}
+
+func exibirMenuUrl() {
+	fmt.Println("\nOque deseja fazer?")
+	fmt.Println("1 - Adicionar url")
+	fmt.Println("2 - Remover url")
+	fmt.Println("0 - Voltar ao menu:")
+}
+
+func exibirMenu() {
+	for {
+		fmt.Println("\nOque deseja fazer?")
+		fmt.Println("1 - Iniciar monitoramento")
+		fmt.Println("2 - Exibir os logs")
+		fmt.Println("3 - Urls")
+		fmt.Println("0 - Sair do programa:")
+		menuFuncionamento()
+	}
+}
+
+// funcionamento das opcoes do menu de urls:
 
 func adicionarUrl() {
 	exibirUrls()
@@ -100,30 +104,37 @@ func removerUrl() {
 	}
 }
 
-// exibicoes:
+// funcionamento das opcoes:
 
-func exibirUrls() {
+func monitoramento() {
+	limparTerminal()
+
+	for _, url := range urls {
+		response, err := http.Get(url)
+
+		if err != nil {
+			fmt.Println("Erro ao acessar a url:", err)
+		} else if response.StatusCode == 200 {
+			fmt.Println("status code:", response.StatusCode, "OK  Site:", url)
+			defer response.Body.Close()
+		} else {
+			fmt.Println("status code:", response.StatusCode, "ERR Site:", url)
+			defer response.Body.Close()
+		}
+	}
+
+}
+
+// ferramentas:
+
+func inputOpcao() int {
+	opcao := 999
+	// variavel opcao recebe o valor digitado pelo usuario, sem expecificar o tipo do input, o proprio go ira inferir o tipo apartir da variavel opcao
+	fmt.Scan(&opcao)
+
+	return opcao
+}
+
+func limparTerminal() {
 	fmt.Print("\033[H\033[2J")
-	fmt.Println("Urls:")
-	for index, url := range urls {
-		fmt.Println("index:", index, ", url:", url)
-	}
-}
-
-func exibirMenuUrl() {
-	fmt.Println("\nOque deseja fazer?")
-	fmt.Println("1 - Adicionar url")
-	fmt.Println("2 - Remover url")
-	fmt.Println("0 - Voltar ao menu:")
-}
-
-func exibirMenu() {
-	for {
-		fmt.Println("\nOque deseja fazer?")
-		fmt.Println("1 - Iniciar monitoramento")
-		fmt.Println("2 - Exibir os logs")
-		fmt.Println("3 - Urls")
-		fmt.Println("0 - Sair do programa:")
-		menuFuncionamento()
-	}
 }
