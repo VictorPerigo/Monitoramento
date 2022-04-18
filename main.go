@@ -1,19 +1,19 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
+	"strings"
 )
 
 func main() {
 	exibirMenu()
 }
 
-var urls []string = []string{
-	"https://www.google.com.br/notfound",
-	"https://www.youtube.com",
-}
+var urls []string = getUrlsFromTxt()
 
 // funcionamento dos menus:
 
@@ -40,7 +40,7 @@ func menuFuncionamentoUrls() {
 
 	switch inputOpcao() {
 	case 1: // Adicionar url
-		adicionarUrl()
+		_ = adicionarUrl()
 	case 2: // Remover url
 		removerUrl()
 	case 0: // Sair do programa
@@ -79,15 +79,20 @@ func exibirMenu() {
 	}
 }
 
-// funcionamento das opcoes do menu de urls:
+// funcionamento das urls:
 
-func adicionarUrl() {
-	exibirUrls()
-	fmt.Println("Digite a url:")
-	var url string
-	fmt.Scan(&url)
-	urls = append(urls, url)
-	fmt.Println("Url adicionada com sucesso!")
+func adicionarUrl() error {
+	file, err := os.OpenFile("urls.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		fmt.Println("Erro ao abrir o arquivo:", err)
+		return err
+	}
+	defer file.Close()
+	if _, err = file.WriteString("jon\n"); err != nil {
+		fmt.Println("Erro ao escrever no arquivo:", err)
+		return err
+	}
+	return nil
 }
 
 func removerUrl() {
@@ -102,6 +107,31 @@ func removerUrl() {
 			break
 		}
 	}
+}
+
+func getUrlsFromTxt() []string {
+	var sites []string
+	file, err := os.Open("urls.txt")
+
+	if err != nil {
+		fmt.Println("Erro ao abrir o arquivo:", err)
+		os.Exit(-1)
+	} else {
+		leitor := bufio.NewReader(file)
+
+		for {
+			linha, err := leitor.ReadString('\n')
+			linha = strings.TrimSpace(linha)
+			sites = append(sites, linha)
+			if err == io.EOF {
+				defer file.Close()
+				break
+			}
+
+		}
+	}
+
+	return sites
 }
 
 // funcionamento das opcoes:
