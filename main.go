@@ -88,10 +88,14 @@ func adicionarUrl() error {
 		return err
 	}
 	defer file.Close()
-	if _, err = file.WriteString("jon\n"); err != nil {
+	url := ""
+	fmt.Println("Digite a url:")
+	fmt.Scan(&url)
+	if _, err = file.WriteString(url + "\n"); err != nil {
 		fmt.Println("Erro ao escrever no arquivo:", err)
 		return err
 	}
+	urls = append(urls, url)
 	return nil
 }
 
@@ -122,7 +126,9 @@ func getUrlsFromTxt() []string {
 		for {
 			linha, err := leitor.ReadString('\n')
 			linha = strings.TrimSpace(linha)
-			sites = append(sites, linha)
+			if linha != "" {
+				sites = append(sites, linha)
+			}
 			if err == io.EOF {
 				defer file.Close()
 				break
