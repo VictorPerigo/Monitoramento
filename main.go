@@ -40,7 +40,7 @@ func menuFuncionamentoUrls() {
 
 	switch inputOpcao() {
 	case 1: // Adicionar url
-		_ = adicionarUrl()
+		_ = selecionarUrl()
 	case 2: // Remover url
 		removerUrl()
 	case 0: // Sair do programa
@@ -54,8 +54,12 @@ func menuFuncionamentoUrls() {
 // exibicoes:
 
 func exibirUrls() {
+	urls = getUrlsFromTxt()
 	limparTerminal()
 	fmt.Println("Urls:")
+	if urls == nil {
+		fmt.Println("Nenhuma url cadastrada")
+	}
 	for index, url := range urls {
 		fmt.Println("index:", index, ", url:", url)
 	}
@@ -81,16 +85,15 @@ func exibirMenu() {
 
 // funcionamento das urls:
 
-func adicionarUrl() error {
+func adicionarUrl(url string) error {
 	file, err := os.OpenFile("urls.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		fmt.Println("Erro ao abrir o arquivo:", err)
 		return err
 	}
+	defer limparTerminal()
 	defer file.Close()
-	url := ""
-	fmt.Println("Digite a url:")
-	fmt.Scan(&url)
+
 	if _, err = file.WriteString(url + "\n"); err != nil {
 		fmt.Println("Erro ao escrever no arquivo:", err)
 		return err
@@ -99,17 +102,31 @@ func adicionarUrl() error {
 	return nil
 }
 
+func selecionarUrl() error {
+	var url string
+
+	fmt.Println("Digite a url:")
+	fmt.Scan(&url)
+
+	if err := adicionarUrl(url); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func removerUrl() {
+	defer limparTerminal()
 	exibirUrls()
 	fmt.Println("\nDigite o index da a url que deseja remover:")
 	var indexEscolhido int
 	fmt.Scan(&indexEscolhido)
-	for index := range urls {
-		if index == indexEscolhido {
-			urls = append(urls[:index], urls[index+1:]...)
-			fmt.Println("Url removida com sucesso!")
-			break
-		}
+	if err := os.Truncate("urls.txt", 0); err != nil {
+		fmt.Println("erro ao recriar arquivo", err)
+	}
+	urls = append(urls[:indexEscolhido], urls[indexEscolhido+1:]...)
+	for _, url := range urls {
+		adicionarUrl(url)
 	}
 }
 
@@ -118,8 +135,7 @@ func getUrlsFromTxt() []string {
 	file, err := os.Open("urls.txt")
 
 	if err != nil {
-		fmt.Println("Erro ao abrir o arquivo:", err)
-		os.Exit(-1)
+		os.Create("urls.txt")
 	} else {
 		leitor := bufio.NewReader(file)
 
