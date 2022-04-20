@@ -138,7 +138,7 @@ func getUrlsFromTxt() []string {
 		os.Create("urls.txt")
 	} else {
 		leitor := bufio.NewReader(file)
-
+		defer file.Close()
 		for {
 			linha, err := leitor.ReadString('\n')
 			linha = strings.TrimSpace(linha)
@@ -146,7 +146,6 @@ func getUrlsFromTxt() []string {
 				sites = append(sites, linha)
 			}
 			if err == io.EOF {
-				defer file.Close()
 				break
 			}
 
@@ -160,7 +159,10 @@ func getUrlsFromTxt() []string {
 
 func monitoramento() {
 	limparTerminal()
-
+	if urls == nil {
+		fmt.Println("Nenhuma url cadastrada")
+		return
+	}
 	for _, url := range urls {
 		response, err := http.Get(url)
 
